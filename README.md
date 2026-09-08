@@ -16,7 +16,8 @@ only in the editable copy at the top of `script.js` and `letter.js`.
 1. **Loading screen** — a crowd of hopping pixel animals and a chunky progress
    bar with a beating heart on its leading edge (~5 seconds), then a Continue
    button pops in.
-2. **Landing** — Mochi introduces itself and offers to open the message.
+2. **Landing** — a short welcome, a note to turn the sound on, and a button
+   to open the message.
 3. **Greeting** — the cat hops down three times, smiles, then says who sent it.
 4. **Message screens** — each line types itself out; Continue stays locked
    until the typing finishes (tap the text to skip).

@@ -33,8 +33,9 @@ const CONFIG = {
   loadingBlocks: 20,         // chunks in the pixel progress bar
 
   /* --- 1. landing screen --- */
-  landingTitle: 'Hi there! 💕',
-  landingSubtitle: 'My name is Mochi, and I am a little messenger cat. Someone asked me to bring you a message...',
+  landingTitle: 'Welcome! 💕',
+  landingSubtitle: 'There is a little message waiting here for you. It only takes a minute, and there is nothing scary inside, promise.',
+  landingNote: 'best with your sound on 🔊',
   landingButton: 'Open the message',
 
   /* --- 2. greeting screen (typed out) ---
@@ -964,6 +965,7 @@ document.addEventListener('click', (e) => {
    ========================================================================= */
 document.getElementById('landing-title').textContent    = CONFIG.landingTitle;
 document.getElementById('landing-subtitle').textContent = CONFIG.landingSubtitle;
+document.getElementById('landing-note').textContent     = CONFIG.landingNote;
 const startBtn = document.getElementById('btn-start');
 startBtn.textContent = CONFIG.landingButton;
 

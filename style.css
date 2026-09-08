@@ -340,6 +340,11 @@ body{
   animation:blink .7s steps(1) infinite;
 }
 @keyframes blink{50%{opacity:0;}}
+.note{
+  font-family:var(--font-head);font-size:.5rem;line-height:1.7;
+  color:var(--plum-soft);opacity:.75;
+  margin:-8px 0 20px;
+}
 .hint{
   font-family:var(--font-head);font-size:.5rem;color:var(--plum-soft);opacity:.6;margin:0 0 18px;
   transition:opacity .3s;
