@@ -88,12 +88,15 @@ const CONFIG = {
       text: "Even though I can't see you right now... I just know you look reallyyyyyy cute.",
       face: 'shy',
       mood: 'shy',
+      track: 'sweet',      // slower, dreamier background music
+      sound: 'sparkle',    // twinkly little sting when it appears
     },
     {
       /* laughs nervously for a moment, then clams up (see `then`) */
       text: 'Haha okay, that was a little silly of me...',
       face: 'laugh',
       mood: 'wiggle',
+      track: 'calm',
       then: { face: 'shut', mood: 'nervous', delayMs: 1600 },
     },
     {
@@ -759,11 +762,17 @@ typedTextEl.addEventListener('click', () => { if (skipTyping) skipTyping(); });
 /** Show the next queued line, or move on to the ask screen when empty. */
 function nextTypingLine() {
   if (state.typingQueue.length === 0) {
-    showScreen('screen-ask', () => setMascotStage(CONFIG.mascotStages.ask));
+    showScreen('screen-ask', () => {
+      setMascotStage(CONFIG.mascotStages.ask);
+      Sound.setTrack('tense');
+      Sound.play('tense');
+    });
     return;
   }
   const line = state.typingQueue.shift();
   setMascotStage(line);              // each line has its own face + animation
+  if (line.track) Sound.setTrack(line.track);   // swap the background music
+  if (line.sound) Sound.play(line.sound);       // one-off sting for this line
 
   /* Optional follow-up: e.g. laugh for a moment, then clam up. Cleared
      automatically if she moves on first (setMascotStage clears it). */
@@ -777,7 +786,11 @@ function nextTypingLine() {
 typingBtn.addEventListener('click', () => {
   if (typingBtn.disabled) return;
   if (state.typingQueue.length === 0) {
-    showScreen('screen-ask', () => setMascotStage(CONFIG.mascotStages.ask));
+    showScreen('screen-ask', () => {
+      setMascotStage(CONFIG.mascotStages.ask);
+      Sound.setTrack('tense');
+      Sound.play('tense');
+    });
   } else {
     // stay on the same screen but re-run the intro animation for the new line
     const screen = document.getElementById('screen-typing');
@@ -1037,6 +1050,7 @@ yesBtn.addEventListener('click', () => {
   if (noBtn.classList.contains('is-loose')) noBtn.remove();  // it lives on <body> by then
   showScreen('screen-celebrate', () => {
     setMascotStage(CONFIG.mascotStages.celebrate);
+    Sound.setTrack('calm');
     Sound.play('fanfare');
     launchConfetti(3200);
   });

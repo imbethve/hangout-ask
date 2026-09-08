@@ -5,9 +5,10 @@
    sound files to download, which keeps the whole thing dependency-free and
    matches the 8-bit look.
 
-   Browsers refuse to play audio until the visitor interacts with the page,
-   so the audio engine wakes up on her first tap/click (the Continue button
-   on the loading screen) and the music starts from there.
+   Browsers refuse to start audio until the visitor interacts with the page,
+   so the engine keeps trying to wake up on every tap/click/key press until
+   it succeeds. In practice that means it starts on the Continue button of
+   the loading screen and just plays from then on - nothing to switch on.
    ========================================================================= */
 
 'use strict';
@@ -16,21 +17,53 @@
    1. SOUND CONFIG — ✏️ EDIT ME
    ========================================================================= */
 const SOUND_CONFIG = {
-  musicOn: true,          // set false to ship it with background music off
+  musicOn: true,          // set false to ship it with no background music
   musicVolume: 0.05,      // background tune (keep it low - it loops forever)
   sfxVolume: 0.13,        // blips and bloops
-  bpm: 96,                // tempo of the background tune
 
-  /* The looping tune: four bars of C - Am - F - G, two notes per beat.
-     Use null for a rest. Note names are like C4, F#5, A3.               */
-  melody: [
-    'C5', 'E5', 'G5', 'E5',   'A4', 'C5', 'E5', 'C5',
-    'F4', 'A4', 'C5', 'A4',   'G4', 'B4', 'D5', 'B4',
-    'C5', 'E5', 'G5', 'C6',   'A5', 'E5', 'C5', 'A4',
-    'F5', 'C5', 'A4', 'F4',   'G4', 'D5', 'B4', 'G5',
-  ],
-  /* One bass note per half bar, under the melody. */
-  bass: ['C3', 'A2', 'F2', 'G2', 'C3', 'A2', 'F2', 'G2'],
+  /* The background music. Each track is a loop: `melody` is one note per
+     eighth note (null = rest) and `bass` is one note per half bar.
+     Switch tracks from the app with Sound.setTrack('tense') etc.          */
+  tracks: {
+    /* the default: sweet and bouncy, C - Am - F - G */
+    calm: {
+      bpm: 96,
+      lead: 'square', bassWave: 'triangle',
+      melody: [
+        'C5', 'E5', 'G5', 'E5',   'A4', 'C5', 'E5', 'C5',
+        'F4', 'A4', 'C5', 'A4',   'G4', 'B4', 'D5', 'B4',
+        'C5', 'E5', 'G5', 'C6',   'A5', 'E5', 'C5', 'A4',
+        'F5', 'C5', 'A4', 'F4',   'G4', 'D5', 'B4', 'G5',
+      ],
+      bass: ['C3', 'A2', 'F2', 'G2', 'C3', 'A2', 'F2', 'G2'],
+    },
+
+    /* the compliment: slower, dreamy, lots of space */
+    sweet: {
+      bpm: 78,
+      lead: 'triangle', bassWave: 'sine',
+      melody: [
+        'F5', null, 'A5', null,   'C6', null, 'A5', null,
+        'G5', null, 'B5', null,   'D6', null, 'B5', null,
+        'E5', null, 'G5', null,   'C6', null, 'G5', null,
+        'F5', null, 'A5', null,   'F5', null, 'C5', null,
+      ],
+      bass: ['F2', 'G2', 'C3', 'F2', 'F2', 'G2', 'C3', 'F2'],
+    },
+
+    /* the big question: faster, minor, driving - proper nerves */
+    tense: {
+      bpm: 138,
+      lead: 'square', bassWave: 'sawtooth',
+      melody: [
+        'A4', 'A4', 'C5', 'A4',   'E5', 'A4', 'C5', 'A4',
+        'G4', 'G4', 'B4', 'G4',   'D5', 'G4', 'B4', 'G4',
+        'F4', 'F4', 'A4', 'F4',   'C5', 'F4', 'A4', 'F4',
+        'E4', 'E4', 'G#4', 'E4',  'B4', 'E4', 'G#4', 'E4',
+      ],
+      bass: ['A2', 'A2', 'G2', 'G2', 'F2', 'F2', 'E2', 'E2'],
+    },
+  },
 };
 
 
@@ -54,21 +87,29 @@ const Sound = {
   master: null,
   sfxGain: null,
   musicGain: null,
-  muted: false,
   ready: false,
+  trackName: 'calm',
   musicTimer: null,
   nextStepTime: 0,
   step: 0,
 
-  /** Called on the first tap - anything earlier would be blocked anyway. */
+  /**
+   * Build (or resume) the audio engine. Safe to call as often as you like -
+   * it does the work once and afterwards only nudges a suspended context.
+   */
   init() {
-    if (this.ready) return;
+    if (this.ready) {
+      // Chrome/Safari can suspend the context again; poke it awake.
+      if (this.ctx && this.ctx.state !== 'running') this.ctx.resume();
+      return;
+    }
+
     const AudioCtx = window.AudioContext || window.webkitAudioContext;
     if (!AudioCtx) return;                 // very old browser: stay silent
 
     this.ctx = new AudioCtx();
     this.master = this.ctx.createGain();
-    this.master.gain.value = this.muted ? 0 : 1;
+    this.master.gain.value = 1;
     this.master.connect(this.ctx.destination);
 
     this.sfxGain = this.ctx.createGain();
@@ -78,6 +119,10 @@ const Sound = {
     this.musicGain = this.ctx.createGain();
     this.musicGain.gain.value = SOUND_CONFIG.musicVolume;
     this.musicGain.connect(this.master);
+
+    // a context built inside a gesture is usually running already, but not
+    // always - resume() is what actually starts it on iOS
+    if (this.ctx.state !== 'running') this.ctx.resume();
 
     this.ready = true;
     if (SOUND_CONFIG.musicOn) this.startMusic();
@@ -104,10 +149,10 @@ const Sound = {
     osc.stop(t + duration + 0.02);
   },
 
-  /** A note that slides from one pitch to another (boings and zips). */
-  slide(from, to, duration, type, volume) {
+  /** A note that slides from one pitch to another (boings, zips, stings). */
+  slide(from, to, duration, type, volume, delay) {
     if (!this.ready) return;
-    const t = this.ctx.currentTime;
+    const t = this.ctx.currentTime + (delay || 0);
     const osc = this.ctx.createOscillator();
     const env = this.ctx.createGain();
 
@@ -129,7 +174,7 @@ const Sound = {
      3. THE SOUND EFFECTS — ✏️ tweak the notes to change how things sound
      -------------------------------------------------------------------- */
   play(name) {
-    if (!this.ready || this.muted) return;
+    if (!this.ready) return;
     const now = this.ctx.currentTime;
     const n = noteFreq;
 
@@ -146,6 +191,24 @@ const Sound = {
       case 'select':                                 // a card or a date
         this.tone(n('A5'), now, 0.05, 'triangle', 0.7);
         this.tone(n('E6'), now + 0.05, 0.09, 'triangle', 0.55);
+        break;
+
+      /* the compliment screen: soft twinkling, like a blush */
+      case 'sparkle':
+        ['E6', 'G#6', 'B6', 'E7', 'B6', 'E7'].forEach((note, i) => {
+          this.tone(n(note), now + i * 0.11, 0.5, 'triangle', 0.4 - i * 0.04);
+        });
+        this.tone(n('E4'), now, 1.2, 'sine', 0.5);
+        break;
+
+      /* the big question: a low ominous sting */
+      case 'tense':
+        this.tone(n('A2'), now, 1.4, 'sawtooth', 0.4);
+        this.tone(n('E3'), now, 1.4, 'triangle', 0.3);
+        ['A4', 'G#4', 'G4', 'F#4'].forEach((note, i) => {   // creeping down
+          this.tone(n(note), now + 0.12 + i * 0.16, 0.2, 'square', 0.4);
+        });
+        this.slide(180, 90, 1.1, 'sawtooth', 0.35, 0.5);
         break;
 
       case 'no':                                     // she pressed NO
@@ -193,8 +256,21 @@ const Sound = {
   },
 
   /* --------------------------------------------------------------------
-     4. BACKGROUND MUSIC (a looping four-bar tune)
+     4. BACKGROUND MUSIC (looping, and switchable per screen)
      -------------------------------------------------------------------- */
+  track() {
+    return SOUND_CONFIG.tracks[this.trackName] || SOUND_CONFIG.tracks.calm;
+  },
+
+  /** Swap to another track from SOUND_CONFIG.tracks, starting from the top. */
+  setTrack(name) {
+    if (this.trackName === name) return;
+    this.trackName = name;
+    if (!this.ready || !SOUND_CONFIG.musicOn) return;
+    this.stopMusic();
+    this.startMusic();
+  },
+
   startMusic() {
     if (!this.ready || this.musicTimer) return;
     this.step = 0;
@@ -210,20 +286,22 @@ const Sound = {
   /* Notes are scheduled a little ahead of time against the audio clock, so
      the tune stays in time even when the browser throttles timers. */
   scheduleMusic() {
-    const stepDur = 30 / SOUND_CONFIG.bpm;          // an eighth note
-    const steps = SOUND_CONFIG.melody.length;
+    const track = this.track();
+    const stepDur = 30 / track.bpm;                 // an eighth note
+    const steps = track.melody.length;
 
     while (this.nextStepTime < this.ctx.currentTime + 0.25) {
       const t = this.nextStepTime;
 
       // melody
-      this.tone(noteFreq(SOUND_CONFIG.melody[this.step]),
-                t, stepDur * 0.9, 'square', 0.5, this.musicGain);
+      this.tone(noteFreq(track.melody[this.step]),
+                t, stepDur * 0.9, track.lead, 0.5, this.musicGain);
 
       // bass, once every four steps
       if (this.step % 4 === 0) {
-        const bassNote = SOUND_CONFIG.bass[(this.step / 4) % SOUND_CONFIG.bass.length];
-        this.tone(noteFreq(bassNote), t, stepDur * 3.4, 'triangle', 0.75, this.musicGain);
+        const bassNote = track.bass[(this.step / 4) % track.bass.length];
+        this.tone(noteFreq(bassNote), t, stepDur * 3.4,
+                  track.bassWave, 0.75, this.musicGain);
       }
 
       this.nextStepTime += stepDur;
@@ -232,49 +310,34 @@ const Sound = {
 
     this.musicTimer = setTimeout(() => this.scheduleMusic(), 60);
   },
-
-  /* --------------------------------------------------------------------
-     5. MUTE
-     -------------------------------------------------------------------- */
-  setMuted(muted) {
-    this.muted = muted;
-    if (this.master) this.master.gain.value = muted ? 0 : 1;
-    try { localStorage.setItem('hangout-muted', muted ? '1' : '0'); } catch (e) { /* private mode */ }
-    const btn = document.getElementById('sound-toggle');
-    if (btn) {
-      btn.textContent = muted ? '🔇' : '🔊';
-      btn.setAttribute('aria-label', muted ? 'Turn sound on' : 'Turn sound off');
-    }
-  },
-
-  toggle() {
-    this.setMuted(!this.muted);
-    if (!this.muted) this.play('click');
-  },
 };
 
 
 /* =========================================================================
-   6. WIRE IT UP: mute button + waking the audio on the first tap
+   5. WAKING THE AUDIO
+   -------------------------------------------------------------------------
+   No on/off button: it simply starts as soon as the browser allows it. The
+   listeners stay attached until the context is actually running, so a tap
+   that arrives before the page is ready cannot leave it silent.
    ========================================================================= */
 (function setupSound() {
-  try { Sound.muted = localStorage.getItem('hangout-muted') === '1'; } catch (e) { /* ignore */ }
+  // clear the old mute setting from earlier versions, so nobody is stuck muted
+  try { localStorage.removeItem('hangout-muted'); } catch (e) { /* private mode */ }
 
-  const btn = document.createElement('button');
-  btn.id = 'sound-toggle';
-  btn.className = 'sound-toggle';
-  btn.type = 'button';
-  btn.textContent = Sound.muted ? '🔇' : '🔊';
-  btn.setAttribute('aria-label', Sound.muted ? 'Turn sound on' : 'Turn sound off');
-  btn.addEventListener('click', (e) => {
-    e.stopPropagation();
+  const wake = () => {
     Sound.init();
-    Sound.toggle();
-  });
-  document.addEventListener('DOMContentLoaded', () => document.body.appendChild(btn));
+    if (Sound.ready && Sound.ctx && Sound.ctx.state === 'running') {
+      ['pointerdown', 'touchstart', 'keydown', 'click'].forEach((ev) =>
+        document.removeEventListener(ev, wake, true));
+    }
+  };
 
-  // the first tap or key press anywhere unlocks audio
-  const wake = () => Sound.init();
-  document.addEventListener('pointerdown', wake, { once: true });
-  document.addEventListener('keydown', wake, { once: true });
+  // capture phase, so this runs before the app's own click handlers
+  ['pointerdown', 'touchstart', 'keydown', 'click'].forEach((ev) =>
+    document.addEventListener(ev, wake, true));
+
+  // if the tab is hidden and comes back, make sure audio is still awake
+  document.addEventListener('visibilitychange', () => {
+    if (!document.hidden) Sound.init();
+  });
 })();

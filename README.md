@@ -72,17 +72,28 @@ offline it falls back to a monospace stack.
 
 ## Sound
 
-Chiptune sound effects and a looping background tune, all generated live with
+Chiptune sound effects and looping background music, all generated live with
 the Web Audio API - there are no audio files. Browsers block audio until the
-visitor interacts, so it wakes up on the first tap (the Continue button on the
-loading screen). A speaker button sits in the top-right corner and the choice
-is remembered in `localStorage`.
+visitor interacts, so it starts itself on her first tap (the Continue button on
+the loading screen) and plays from then on. There is nothing to switch on.
 
-Everything is in `SOUND_CONFIG` at the top of [`sound.js`](sound.js): volumes,
-tempo, and the melody/bass as plain note names. Set `musicOn: false` to ship it
-with the tune off. The effects themselves (typing blip, click, YES arpeggio,
-NO sad slide, celebration fanfare, boings) are in `Sound.play()` - change the
-notes there to change how anything sounds.
+The music changes with the mood - three loops in `SOUND_CONFIG.tracks`:
+
+| Track | Where | Feel |
+| --- | --- | --- |
+| `calm` | most screens | bouncy C - Am - F - G, 96 bpm |
+| `sweet` | the compliment | slow and dreamy, 78 bpm |
+| `tense` | the question | driving A minor, 138 bpm |
+
+A message screen can set `track: 'sweet'` to change the music and
+`sound: 'sparkle'` to fire a one-off sting when it appears.
+
+Everything is in `SOUND_CONFIG` at the top of [`sound.js`](sound.js): volumes
+and the tracks, written as plain note names. Set `musicOn: false` to ship it
+with no background music. The effects themselves (typing blip, click, YES
+arpeggio, NO sad slide, the tense sting, the compliment twinkle, celebration
+fanfare, boings) are in `Sound.play()` - change the notes there to change how
+anything sounds.
 
 ## Files
 
