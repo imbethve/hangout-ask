@@ -70,8 +70,23 @@ python -m http.server 5599
 The pixel fonts (Press Start 2P, Pixelify Sans) load from Google Fonts, so
 offline it falls back to a monospace stack.
 
+## Sound
+
+Chiptune sound effects and a looping background tune, all generated live with
+the Web Audio API - there are no audio files. Browsers block audio until the
+visitor interacts, so it wakes up on the first tap (the Continue button on the
+loading screen). A speaker button sits in the top-right corner and the choice
+is remembered in `localStorage`.
+
+Everything is in `SOUND_CONFIG` at the top of [`sound.js`](sound.js): volumes,
+tempo, and the melody/bass as plain note names. Set `musicOn: false` to ship it
+with the tune off. The effects themselves (typing blip, click, YES arpeggio,
+NO sad slide, celebration fanfare, boings) are in `Sound.play()` - change the
+notes there to change how anything sounds.
+
 ## Files
 
 - `index.html` — screen markup
 - `style.css` — pastel pixel theme, every animation
+- `sound.js` — the chiptune synth, sound effects and background music
 - `script.js` — config, sprites, and all the logic

@@ -507,6 +507,8 @@ function playMascotEntrance() {
   mascotEl.classList.remove('is-entering');
   void mascotEl.getBoundingClientRect();
   mascotEl.classList.add('is-entering');
+  // one boing per landing of the three-hop entrance
+  [380, 900, 1300].forEach((at) => setTimeout(() => Sound.play('hop'), at));
 
   // once the hops are done, settle into the gentle idle bob
   clearTimeout(entranceTimer);
@@ -565,6 +567,7 @@ function showBubble(text, level) {
   bubbleTextEl.textContent = text;
   bubbleEl.className = 'bubble' + (level > 1 ? ' lv' + level : '');
   bubbleEl.hidden = false;
+  Sound.play('pop');
   // restart the pop animation each time the text changes
   void bubbleEl.getBoundingClientRect();
 }
@@ -577,6 +580,7 @@ function hideBubble() {
 let clickIndex = 0;
 
 function pokeMascot() {
+  Sound.play('poke');
   const reaction = CONFIG.mascotClicks[clickIndex % CONFIG.mascotClicks.length];
   clickIndex++;
 
@@ -739,6 +743,7 @@ function typeText(target, text, button, speed = CONFIG.typingSpeed) {
 
   typingTimer = setInterval(() => {
     i++;
+    if (i % 3 === 0) Sound.play('type');    // a soft blip as it types
     target.innerHTML = escapeHtml(text.slice(0, i)) + caret;
     if (i >= text.length) finish();
   }, speed);
@@ -831,11 +836,13 @@ paintStatus(0);
    takes exactly CONFIG.loadingDurationMs even if the browser throttles
    timers (background tab, slow device). */
 const loadStart = Date.now();
+let lastFilled = 0;
 
 const loadTimer = setInterval(() => {
   const progress = Math.min((Date.now() - loadStart) / CONFIG.loadingDurationMs, 1);
   const filled = Math.round(progress * CONFIG.loadingBlocks);
 
+  if (filled > lastFilled) { Sound.play('tick'); lastFilled = filled; }
   loadBlocks.forEach((b, i) => b.classList.toggle('on', i < filled));
   paintStatus(Math.round(progress * 100));
   loadHeartEl.style.left = (progress * 100) + '%';   // heart rides the edge
@@ -843,6 +850,7 @@ const loadTimer = setInterval(() => {
   if (progress >= 1) {
     clearInterval(loadTimer);
     loadHeartEl.classList.add('is-done');            // happy spin-pop
+    Sound.play('loaded');
 
     loadStatusEl.textContent = CONFIG.loadingDoneStatus;
     loadingBtn.hidden = false;      // pops in via the .btn-pop animation
@@ -850,6 +858,14 @@ const loadTimer = setInterval(() => {
 }, 80);
 
 loadingBtn.addEventListener('click', () => showScreen('screen-landing'));
+
+/* Every ordinary button gets a click blip. YES, NO and the cat have their
+   own sounds, so they are skipped here. */
+document.addEventListener('click', (e) => {
+  const btn = e.target.closest('.btn, .cal-nav');
+  if (!btn || btn.id === 'btn-yes' || btn.id === 'btn-no') return;
+  Sound.play('click');
+});
 
 /* =========================================================================
    6. LANDING SCREEN
@@ -943,6 +959,7 @@ window.addEventListener('resize', () => {
 
 noBtn.addEventListener('click', () => {
   state.noClicks++;
+  Sound.play('no');
 
   // YES keeps growing with every click and stays at its biggest.
   const n = state.noClicks;
@@ -1014,11 +1031,13 @@ noBtn.addEventListener('focus',       () => peekMascot(CONFIG.mascotNoHover));
 });
 
 yesBtn.addEventListener('click', () => {
+  Sound.play('yes');
   clearTimeout(sadTimer);
   mascotWrap.classList.remove('is-hiding');   // pop back up, she said yes
   if (noBtn.classList.contains('is-loose')) noBtn.remove();  // it lives on <body> by then
   showScreen('screen-celebrate', () => {
     setMascotStage(CONFIG.mascotStages.celebrate);
+    Sound.play('fanfare');
     launchConfetti(3200);
   });
 });
@@ -1084,6 +1103,7 @@ function renderCalendar() {
     if (sameDay(date, state.selectedDate)) cell.classList.add('selected');
 
     cell.addEventListener('click', () => {
+      Sound.play('select');
       state.selectedDate = date;
       pickedEl.textContent = formatDate(date);
       dateBtn.disabled = false;                              // unlock Continue
@@ -1159,6 +1179,7 @@ CONFIG.activities.forEach((activity) => {
   card.innerHTML = `<span class="emoji">${activity.emoji}</span><span>${activity.label}</span>`;
 
   card.addEventListener('click', () => {
+    Sound.play('select');
     clearActivityCards();
     card.classList.add('selected');
     // picking a card wins over anything typed in the box
@@ -1203,6 +1224,7 @@ activityBtn.addEventListener('click', () => {
   renderFinalScreen();
   showScreen('screen-final', () => {
     setMascotStage(CONFIG.mascotStages.final);
+    Sound.play('fanfare');
     launchConfetti(2600);
   });
 });
