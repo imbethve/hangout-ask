@@ -139,7 +139,11 @@ Nothing is sent anywhere - there is no server and no tracking. Instead the
 final screen draws her answer as a 1080x1350 pixel-art letter on a `<canvas>`
 (no screenshot library involved) and offers it to her:
 
-- **Save the picture** downloads the PNG.
+- **Save the picture** downloads the PNG. On an iPhone the download attribute
+  is ignored for a picture made in the page, so there the button opens the
+  share sheet instead, which has Save Image in it.
+- The picture on screen is a `data:` URL rather than a `blob:` one, because
+  iOS will not "Save Image" from a blob - so pressing and holding it works.
 - **Share it now** appears on phones that support it and opens the native
   share sheet with the image attached, so Instagram / WhatsApp / Messenger
   are one tap away.

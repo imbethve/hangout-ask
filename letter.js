@@ -26,12 +26,13 @@ const LETTER_CONFIG = {
   /* Text shown under the picture on the final screen. */
   howTo: 'Save this picture and send it to him 💌',
   steps: [
-    '1. Tap Save the picture (or hold the picture to save it)',
+    '1. Tap Save the picture, or press and hold the picture itself',
     '2. Send it to him on any of these, and he will know',
   ],
   saveButton: 'Save the picture',
   shareButton: 'Share it now',
   savedMessage: 'Saved 💾 now send it to him',
+  holdMessage: 'Press and hold the picture above, then Save Image 💾',
 
   /* Text that goes with the image when she uses the share button. */
   shareText: 'Mochi just delivered your message 💕',
@@ -232,29 +233,47 @@ async function buildFinalLetter(dateText, activityText) {
   const blob = await Letter.toBlob();
   if (!blob) return;
 
+  /* A data: URL rather than a blob: URL - iOS refuses to "Save Image" from a
+     blob, but happily saves a data URL when she presses and holds it. */
+  img.src = Letter.canvas.toDataURL('image/png');
+
   const url = URL.createObjectURL(blob);
-  img.src = url;                       // she can also just hold the picture
+  const file = new File([blob], LETTER_CONFIG.fileName, { type: 'image/png' });
+  const canShareFile = !!(navigator.canShare && navigator.canShare({ files: [file] }));
+
+  /* iPhones and iPads ignore the download attribute for a picture made in the
+     page, so there the share sheet (which has "Save Image" in it) is the way. */
+  const isApplePhone = /iP(hone|ad|od)/.test(navigator.userAgent) ||
+    (navigator.maxTouchPoints > 1 && /Mac/.test(navigator.userAgent));
+
+  const holdHint = () => { howToEl.textContent = LETTER_CONFIG.holdMessage; };
+
+  const shareIt = () => navigator.share({ files: [file], text: LETTER_CONFIG.shareText })
+    .then(() => { howToEl.textContent = LETTER_CONFIG.savedMessage; })
+    .catch(() => { /* she closed the sheet */ });
 
   /* --- save it --- */
   saveBtn.onclick = () => {
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = LETTER_CONFIG.fileName;
-    document.body.appendChild(a);
-    a.click();
-    a.remove();
-    howToEl.textContent = LETTER_CONFIG.savedMessage;
+    if (isApplePhone && canShareFile) return shareIt();
+
+    try {
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = LETTER_CONFIG.fileName;
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+      howToEl.textContent = LETTER_CONFIG.savedMessage;
+    } catch (e) {
+      holdHint();
+    }
   };
 
   /* --- or share the actual file, which opens her phone's share sheet
          with Instagram / WhatsApp / Messenger right in it --- */
-  const file = new File([blob], LETTER_CONFIG.fileName, { type: 'image/png' });
-  if (navigator.canShare && navigator.canShare({ files: [file] })) {
+  if (canShareFile) {
     shareBtn.hidden = false;
-    shareBtn.onclick = () => {
-      navigator.share({ files: [file], text: LETTER_CONFIG.shareText })
-        .catch(() => { /* she closed the sheet - nothing to do */ });
-    };
+    shareBtn.onclick = shareIt;
   }
 }
 
