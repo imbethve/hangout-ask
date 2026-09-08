@@ -77,6 +77,10 @@ the Web Audio API - there are no audio files. Browsers block audio until the
 visitor interacts, so it starts itself on her first tap (the Continue button on
 the loading screen) and plays from then on. There is nothing to switch on.
 
+That also means the blips as the loading bar fills can only be heard once the
+browser trusts the page, so the finished-loading chime is played on that first
+Continue click instead of being lost.
+
 The music changes with the mood - three loops in `SOUND_CONFIG.tracks`:
 
 | Track | Where | Feel |
@@ -94,6 +98,28 @@ with no background music. The effects themselves (typing blip, click, YES
 arpeggio, NO sad slide, the tense sting, the compliment twinkle, celebration
 fanfare, boings) are in `Sound.play()` - change the notes there to change how
 anything sounds.
+
+## Background moods
+
+The sky changes with the story. Two stacked layers cross-fade into each other
+(CSS cannot animate between two gradients directly), and the little emoji
+drifting upwards swap over at the same time.
+
+| Theme | Where | Look |
+| --- | --- | --- |
+| `loading` / `landing` | the start | soft pink |
+| `typing` | the message screens | warm peach |
+| `sweet` | the compliment | dreamy pink-lavender |
+| `funny` | laughing it off | sunny cream |
+| `tense` | "Well..." and the question | deep dusk rose |
+| `celebrate` | after YES | party yellow into mint |
+| `date` | the calendar | sky blue |
+| `activity` | the options | fresh mint |
+| `final` | the ending | sunset peach into lilac |
+
+They live in `CONFIG.themes` (a CSS background plus the emoji list) and
+`CONFIG.screenThemes` maps each screen to one. A message screen can pick its
+own with `theme: 'sweet'`.
 
 ## Files
 

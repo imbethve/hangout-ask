@@ -88,6 +88,7 @@ const CONFIG = {
       text: "Even though I can't see you right now... I just know you look reallyyyyyy cute.",
       face: 'shy',
       mood: 'shy',
+      theme: 'sweet',      // dreamy pink-lavender background
       track: 'sweet',      // slower, dreamier background music
       sound: 'sparkle',    // twinkly little sting when it appears
     },
@@ -96,6 +97,7 @@ const CONFIG = {
       text: 'Haha okay, that was a little silly of me...',
       face: 'laugh',
       mood: 'wiggle',
+      theme: 'funny',      // sunny cream yellow
       track: 'calm',
       then: { face: 'shut', mood: 'nervous', delayMs: 1600 },
     },
@@ -103,6 +105,8 @@ const CONFIG = {
       text: 'Well...',
       face: 'nervous',
       mood: 'nervous',
+      theme: 'tense',      // the sky starts to darken
+      track: 'tense',
       speed: 220,          // slow again, building up to the question
     },
   ],
@@ -178,6 +182,45 @@ const CONFIG = {
   finalSignoff: 'See you soon! 💕',
   finalDateLabel: 'When',
   finalActivityLabel: 'What',
+
+
+  /* --- background mood per screen — ✏️ EDIT ME ---
+     `sky` is any CSS background, `hearts` are the little things drifting up.
+     A message screen can pick one of these with `theme: 'sweet'`.          */
+  themes: {
+    loading:  { sky: 'radial-gradient(120% 80% at 50% 0%, #ffe6f2 0%, #fff5fa 45%, #f3e9ff 100%)',
+                hearts: ['💗', '💕', '🌸', '✨', '💖'] },
+    landing:  { sky: 'radial-gradient(120% 80% at 50% 0%, #ffe1ee 0%, #fff6f8 50%, #ffeede 100%)',
+                hearts: ['💗', '💕', '🌸', '✨', '💖'] },
+    typing:   { sky: 'radial-gradient(120% 80% at 50% 0%, #fff0e2 0%, #fffaf3 50%, #ffeef6 100%)',
+                hearts: ['💗', '☀️', '🌸', '✨', '💕'] },
+    sweet:    { sky: 'radial-gradient(120% 90% at 50% 10%, #ffd9ee 0%, #f6e6ff 45%, #e4dcff 100%)',
+                hearts: ['💗', '✨', '🌸', '💞', '🫧'] },
+    funny:    { sky: 'radial-gradient(120% 80% at 50% 0%, #fff6d6 0%, #fffdf0 50%, #ffeef2 100%)',
+                hearts: ['😆', '✨', '💫', '🌼', '😹'] },
+    tense:    { sky: 'radial-gradient(120% 90% at 50% 0%, #ffbcd2 0%, #e79ab8 45%, #9c76a6 100%)',
+                hearts: ['💓', '😳', '💗', '⚡', '💦'] },
+    celebrate:{ sky: 'radial-gradient(120% 80% at 50% 0%, #fff3b0 0%, #ffe0ef 45%, #d9f5ea 100%)',
+                hearts: ['🎉', '🎊', '✨', '💖', '⭐'] },
+    date:     { sky: 'radial-gradient(120% 80% at 50% 0%, #dff0ff 0%, #f2f9ff 50%, #ffeef7 100%)',
+                hearts: ['☁️', '🗓️', '✨', '💙', '💗'] },
+    activity: { sky: 'radial-gradient(120% 80% at 50% 0%, #dff7e8 0%, #f4fff8 50%, #fff0f6 100%)',
+                hearts: ['🌿', '✨', '💚', '🍀', '💗'] },
+    final:    { sky: 'radial-gradient(120% 90% at 50% 0%, #ffd9c2 0%, #ffd3e4 45%, #f0d4ff 100%)',
+                hearts: ['💕', '✨', '🌅', '💖', '⭐'] },
+  },
+
+  /* which theme each screen uses */
+  screenThemes: {
+    'screen-loading':  'loading',
+    'screen-landing':  'landing',
+    'screen-typing':   'typing',
+    'screen-ask':      'tense',
+    'screen-celebrate':'celebrate',
+    'screen-date':     'date',
+    'screen-activity': 'activity',
+    'screen-final':    'final',
+  },
 
   /* --- mascot per stage — ✏️ mix and match faces + moods here ---
      Faces : happy | shy | nervous | curious | pleading | sad | excited | love
@@ -695,6 +738,7 @@ function showScreen(id, onShown) {
 
   const prev = currentScreen;
   prev.classList.add('is-leaving');
+  setTheme(CONFIG.screenThemes[id]);
   if (typeof hideBubble === 'function') hideBubble();
 
   setTimeout(() => {
@@ -705,6 +749,34 @@ function showScreen(id, onShown) {
   }, OUT_DURATION);
 }
 
+
+
+/* =========================================================================
+   4b. BACKGROUND MOOD
+   -------------------------------------------------------------------------
+   Two stacked sky layers cross-fade into each other, because CSS cannot
+   animate between two gradients directly. The floating emoji swap over too.
+   ========================================================================= */
+const skyLayers = [document.getElementById('bg-a'), document.getElementById('bg-b')];
+let skyIndex = 0;                 // which layer is currently showing
+let currentTheme = null;
+let heartEls = [];                // filled in when the hearts are spawned
+
+function setTheme(name) {
+  const theme = CONFIG.themes[name];
+  if (!theme || name === currentTheme) return;
+  currentTheme = name;
+
+  // paint the hidden layer, then fade it in over the visible one
+  const next = skyLayers[1 - skyIndex];
+  next.style.background = theme.sky;
+  next.classList.add('is-on');
+  skyLayers[skyIndex].classList.remove('is-on');
+  skyIndex = 1 - skyIndex;
+
+  // the drifting emoji change with the mood
+  heartEls.forEach((el, i) => { el.textContent = theme.hearts[i % theme.hearts.length]; });
+}
 
 /* =========================================================================
    5. TYPING ANIMATION + "Continue stays disabled until done"
@@ -771,6 +843,7 @@ function nextTypingLine() {
   }
   const line = state.typingQueue.shift();
   setMascotStage(line);              // each line has its own face + animation
+  setTheme(line.theme || 'typing');            // background mood for this line
   if (line.track) Sound.setTrack(line.track);   // swap the background music
   if (line.sound) Sound.play(line.sound);       // one-off sting for this line
 
@@ -870,7 +943,13 @@ const loadTimer = setInterval(() => {
   }
 }, 80);
 
-loadingBtn.addEventListener('click', () => showScreen('screen-landing'));
+loadingBtn.addEventListener('click', () => {
+  /* This click is what unlocks audio in most browsers, so the finished-
+     loading chime is played here too - otherwise she would never hear it. */
+  Sound.init();
+  Sound.play('loaded');
+  showScreen('screen-landing');
+});
 
 /* Every ordinary button gets a click blip. YES, NO and the cat have their
    own sounds, so they are skipped here. */
@@ -1351,6 +1430,7 @@ function launchConfetti(durationMs = 3000, count = 140) {
     el.style.animationDuration = 12 + Math.random() * 12 + 's';
     el.style.animationDelay = -Math.random() * 20 + 's';
     wrap.appendChild(el);
+    heartEls.push(el);
   }
 })();
 
@@ -1361,3 +1441,4 @@ function launchConfetti(durationMs = 3000, count = 140) {
 /* The landing screen shows no mascot — it only appears (hopping in) on the
    greeting screen. The face is pre-drawn so the first frame is never empty. */
 setMascotStage(CONFIG.mascotStages.landing);
+setTheme('loading');

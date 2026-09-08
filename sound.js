@@ -324,6 +324,11 @@ const Sound = {
   // clear the old mute setting from earlier versions, so nobody is stuck muted
   try { localStorage.removeItem('hangout-muted'); } catch (e) { /* private mode */ }
 
+  /* Try straight away: browsers that already trust this site (she has been
+     here before, or opened it from a tap) will let the loading blips play.
+     If it is blocked, the listeners below pick it up on the first click. */
+  document.addEventListener('DOMContentLoaded', () => Sound.init());
+
   const wake = () => {
     Sound.init();
     if (Sound.ready && Sound.ctx && Sound.ctx.state === 'running') {
