@@ -119,8 +119,22 @@
       <section class="screen" id="screen-final">
         <h1 class="title big" id="final-title"></h1>
         <p class="subtitle" id="final-message"></p>
-        <div class="summary" id="final-summary"></div>
         <p class="signoff" id="final-signoff"></p>
+
+        <!-- the saveable picture, drawn on a canvas by letter.js -->
+        <div class="letter-wrap">
+          <img id="letter-img" alt="A little letter with our hangout plan" />
+        </div>
+
+        <p class="howto" id="final-howto"></p>
+        <div class="steps" id="final-steps"></div>
+
+        <div class="save-row">
+          <button class="btn btn-primary" id="btn-save" type="button">Save the picture</button>
+          <button class="btn btn-primary" id="btn-share" type="button" hidden>Share it now</button>
+        </div>
+
+        <div class="social-row" id="social-row"></div>
       </section>
 
     </div>
@@ -128,5 +142,6 @@
 
   <script src="sound.js"></script>
   <script src="script.js"></script>
+  <script src="letter.js"></script>
 </body>
 </html>

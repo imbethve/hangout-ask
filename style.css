@@ -568,6 +568,55 @@ body{
   100%{transform:scale(1);}
 }
 
+/* ---------- the saveable letter ---------- */
+.letter-wrap{
+  margin:6px auto 16px;
+  max-width:280px;
+  border:6px solid var(--pink-300);
+  background:var(--pink-50);
+  line-height:0;
+}
+#letter-img{width:100%;height:auto;display:block;}
+
+.howto{
+  font-family:var(--font-head);font-size:.6rem;line-height:1.7;
+  color:var(--pink-600);margin:0 0 12px;
+}
+.steps{
+  display:flex;flex-direction:column;gap:6px;
+  margin:0 0 18px;
+  font-size:.95rem;font-weight:600;color:var(--plum-soft);
+  text-align:left;
+}
+.steps span{display:block;}
+
+.save-row{
+  display:flex;flex-wrap:wrap;gap:12px;justify-content:center;
+  margin-bottom:22px;
+}
+.save-row .btn{margin-top:0;}
+
+/* ---------- send-it-to-me buttons ---------- */
+.social-row{
+  display:flex;gap:10px;justify-content:center;flex-wrap:wrap;
+}
+.social{
+  display:flex;flex-direction:column;align-items:center;gap:6px;
+  padding:10px 8px;
+  min-width:88px;
+  text-decoration:none;
+  font-family:var(--font-head);font-size:.45rem;line-height:1.6;
+  color:#fff;
+  border:4px solid rgba(0,0,0,.18);
+  transition:transform .18s;
+}
+.social:hover{transform:translateY(-3px);}
+.social:active{transform:translateY(2px);}
+.social svg{width:26px;height:26px;display:block;}
+.social.is-whatsapp{background:#3fbf62;}
+.social.is-instagram{background:#d6337f;}
+.social.is-messenger{background:#3b7cf6;}
+
 /* ---------- responsive ---------- */
 @media (max-width:380px){
   .card{padding:32px 16px 26px;}

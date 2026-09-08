@@ -18,7 +18,9 @@ No backend, no build step, no dependencies — just open `index.html`.
 7. **Date picker** — a pixel calendar; the cat gets more and more panicked
    the further into the future you page.
 8. **Activity picker** — cards, plus a "type your own idea" box.
-9. **Final screen** — a summary of the date and the plan.
+9. **Final screen** — the answer drawn as a pixel-art letter she can save
+   and send back, with instructions and WhatsApp / Instagram / Messenger
+   buttons.
 
 ## Editing the words
 
@@ -121,9 +123,28 @@ They live in `CONFIG.themes` (a CSS background plus the emoji list) and
 `CONFIG.screenThemes` maps each screen to one. A message screen can pick its
 own with `theme: 'sweet'`.
 
+## Getting her answer back
+
+Nothing is sent anywhere - there is no server and no tracking. Instead the
+final screen draws her answer as a 1080x1350 pixel-art letter on a `<canvas>`
+(no screenshot library involved) and offers it to her:
+
+- **Save the picture** downloads the PNG.
+- **Share it now** appears on phones that support it and opens the native
+  share sheet with the image attached, so Instagram / WhatsApp / Messenger
+  are one tap away.
+- The three buttons underneath open those apps directly.
+
+Fill in `LETTER_CONFIG.contact` in [`letter.js`](letter.js) with your WhatsApp
+number, Instagram username or Facebook username and those buttons open a chat
+with **you** instead of just opening the app. Everything on the letter - the
+title, labels, note, sign-off and the instructions under it - is in
+`LETTER_CONFIG` too.
+
 ## Files
 
 - `index.html` — screen markup
 - `style.css` — pastel pixel theme, every animation
 - `sound.js` — the chiptune synth, sound effects and background music
 - `script.js` — config, sprites, and all the logic
+- `letter.js` — draws the saveable letter and the send-it-to-me buttons

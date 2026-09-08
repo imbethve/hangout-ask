@@ -1331,15 +1331,17 @@ function renderFinalScreen() {
   document.getElementById('final-message').textContent = CONFIG.finalMessage;
   document.getElementById('final-signoff').textContent = CONFIG.finalSignoff;
 
-  const dateText = state.selectedDate ? formatDate(state.selectedDate) : '—';
+  const dateText = state.selectedDate ? formatDate(state.selectedDate) : '-';
   const actText  = state.selectedActivity
     ? `${state.selectedActivity.emoji} ${state.selectedActivity.label}`
-    : '—';
+    : '-';
 
-  document.getElementById('final-summary').innerHTML = `
-    <div class="row"><span class="label">${CONFIG.finalDateLabel}</span><span>${dateText}</span></div>
-    <div class="row"><span class="label">${CONFIG.finalActivityLabel}</span><span>${actText}</span></div>
-  `;
+  /* The letter picture carries the date and the plan now, so she has
+     something to actually save and send. */
+  if (typeof buildFinalLetter === 'function') {
+    buildFinalLetter(dateText, actText);
+    buildSocialLinks();
+  }
 }
 
 
