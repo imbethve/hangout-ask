@@ -3,23 +3,32 @@
 A tiny single-page pixel-art web app for asking someone to hang out.
 No backend, no build step, no dependencies — just open `index.html`.
 
+**Mochi does the asking.** The pixel cat is a messenger delivering the message
+on your behalf - it introduces itself, passes on what you wanted to say, asks
+the question for you and takes notes. That way nothing on screen is you
+talking directly, which makes the whole thing easier to send.
+
+To rename the cat, search the project for `Mochi` and replace it - it appears
+only in the editable copy at the top of `script.js` and `letter.js`.
+
 ## The flow
 
 1. **Loading screen** — a crowd of hopping pixel animals and a chunky progress
    bar with a beating heart on its leading edge (~5 seconds), then a Continue
    button pops in.
-2. **Landing** — "Hi there!" and a Get Started button.
-3. **Greeting** — the pixel cat hops down three times, smiles, then settles.
+2. **Landing** — Mochi introduces itself and offers to open the message.
+3. **Greeting** — the cat hops down three times, smiles, then says who sent it.
 4. **Message screens** — each line types itself out; Continue stays locked
    until the typing finishes (tap the text to skip).
-5. **The ask** — YES grows with every NO click and stays big, NO relabels
-   itself and flies off to a random spot on the screen, and the cat reacts.
+5. **The ask** — Mochi asks on your behalf; YES grows with every NO click and
+   stays big, NO relabels itself and flies off to a random spot on the screen,
+   and the cat gets more and more worried on your behalf.
 6. **Celebration** — confetti.
 7. **Date picker** — a pixel calendar; the cat gets more and more panicked
    the further into the future you page.
 8. **Activity picker** — cards, plus a "type your own idea" box.
-9. **Final screen** — the answer drawn as a pixel-art letter she can save
-   and send back, with instructions and WhatsApp / Instagram / Messenger
+9. **Final screen** — Mochi's note, drawn as a pixel-art letter she can save
+   and send to you, with instructions and WhatsApp / Instagram / Messenger
    buttons.
 
 ## Editing the words

@@ -34,15 +34,15 @@ const CONFIG = {
 
   /* --- 1. landing screen --- */
   landingTitle: 'Hi there! 💕',
-  landingSubtitle: 'I made this little thing just for you...',
-  landingButton: 'Get Started',
+  landingSubtitle: 'My name is Mochi, and I am a little messenger cat. Someone asked me to bring you a message...',
+  landingButton: 'Open the message',
 
   /* --- 2. greeting screen (typed out) ---
      `face` + `mood` control how the mascot looks & moves on this screen.
      Faces : happy | shy | nervous | curious | pleading | sad | excited | love
      Moods : idle  | shy | nervous | curious | wiggle   | sad | happy   | love  */
   greeting: {
-    text: 'Hiii! I have something to ask you...',
+    text: 'Hiii, Mochi here. I am delivering this for someone who likes you a lot.',
     face: 'happy',   // it smiles once it has finished hopping in
     mood: 'idle',
   },
@@ -64,17 +64,17 @@ const CONFIG = {
      bigger number to make that line type out slowly.                        */
   flirtyLines: [
     {
-      text: 'I hope your day is going well so far, and please do not stress about anything okay?',
+      text: 'First he asked me to check that your day is going okay, and to tell you not to stress about anything.',
       face: 'happy',
       mood: 'idle',
     },
     {
-      text: 'I had so much fun last time we hung out.',
+      text: 'He says he had so much fun the last time you two hung out.',
       face: 'excited',
       mood: 'wiggle',
     },
     {
-      text: 'Oh, and I hope you enjoyed my little gift from last time.',
+      text: 'Oh, and he hopes you liked the little gift he gave you.',
       face: 'love',
       mood: 'love',
     },
@@ -85,7 +85,7 @@ const CONFIG = {
       speed: 220,          // types out slowly on purpose
     },
     {
-      text: "Even though I can't see you right now... I just know you look reallyyyyyy cute.",
+      text: 'He told me to tell you that even though he cannot see you right now, he just knows you look reallyyyyyy cute.',
       face: 'shy',
       mood: 'shy',
       theme: 'sweet',      // dreamy pink-lavender background
@@ -94,7 +94,7 @@ const CONFIG = {
     },
     {
       /* laughs nervously for a moment, then clams up (see `then`) */
-      text: 'Haha okay, that was a little silly of me...',
+      text: 'Haha okay, he made me say it exactly like that. A little silly of him...',
       face: 'laugh',
       mood: 'wiggle',
       theme: 'funny',      // sunny cream yellow
@@ -112,7 +112,7 @@ const CONFIG = {
   ],
 
   /* --- 4. the ask --- */
-  askQuestion: 'Would you like to hang out with me?',
+  askQuestion: 'So... would you like to hang out with him?',
   yesLabel: 'YES 💖',
   /* The NO button relabels itself on every click. Index 0 is the label it
      starts with; the last one sticks once she runs out of clicks. */
@@ -134,35 +134,35 @@ const CONFIG = {
   noReactions: [
     'Wait... are you sure? 🥺',
     'Hmm, maybe think about it one more time?',
-    'That kinda hurt a little... 😢',
+    'Do I really have to tell him that? 😢',
     'The YES button is getting suspiciously big...',
-    'Pleeeease? I promise it will be fun 🥹',
-    'I even planned what we could do already...',
-    'My little heart is cracking 💔',
+    'Pleeeease? He promised it will be fun 🥹',
+    'He already has ideas about what you could do...',
+    'My little messenger heart is cracking 💔',
     'Okay okay... just one tiny yes?',
-    'I will be very very sad forever 😭',
+    'He is going to be very very sad forever 😭',
     'Last chance... look how huge YES is! 🥺💖',
   ],
 
   /* --- 5. celebration --- */
   celebrateTitle: 'Yay!! 🎉',
-  celebrateSubtitle: 'You just made my whole week. Now let us plan it!',
+  celebrateSubtitle: 'He is going to be so happy. Now help me write it down for him.',
 
   /* --- 6. date picker --- */
-  dateTitle: 'When are you free? 🗓️',
+  dateTitle: 'When are you free? 🗓️',   // Mochi is taking notes
   /* What the cat says as she pages further into the future. Entry 0 is one
      month ahead, entry 1 is two months ahead, and so on - the last entry
      keeps showing after that. `level` 1-4 sets how panicky the bubble looks. */
   monthReactions: [
-    { text: 'Thats so long 😢',              face: 'curious',  mood: 'curious', level: 1 },
-    { text: 'That is really far away 😥',    face: 'sad',      mood: 'shy',     level: 2 },
-    { text: 'Wait, that is months away 😰',  face: 'nervous',  mood: 'nervous', level: 3 },
-    { text: 'I cannot wait that long 😱',    face: 'nervous',  mood: 'shiver',  level: 4 },
-    { text: 'I will be a ghost by then 👻',  face: 'sad',      mood: 'shake',   level: 4 },
+    { text: 'Thats so long 😢',                face: 'curious',  mood: 'curious', level: 1 },
+    { text: 'He will be waiting a while 😥',   face: 'sad',      mood: 'shy',     level: 2 },
+    { text: 'Wait, that is months away 😰',    face: 'nervous',  mood: 'nervous', level: 3 },
+    { text: 'He cannot wait that long 😱',     face: 'nervous',  mood: 'shiver',  level: 4 },
+    { text: 'We will both be ghosts by then 👻', face: 'sad',    mood: 'shake',   level: 4 },
   ],
 
   /* --- 7. activity picker — add your own options here --- */
-  activityTitle: 'What should we do? ✨',
+  activityTitle: 'What should you two do? ✨',
   activities: [
     { id: 'movie',    emoji: '🎬', label: 'Movie' },
     { id: 'sports',   emoji: '🏸', label: 'Sports' },
@@ -172,14 +172,14 @@ const CONFIG = {
     // { id: 'cafe',  emoji: '☕', label: 'Coffee' },   <-- example of adding more
   ],
   /* the type-your-own box under the cards */
-  activityOtherLabel: 'Or tell me your own idea 💭',
+  activityOtherLabel: 'Or tell me your own idea and I will pass it on 💭',
   activityOtherPlaceholder: 'Your choice...',
   activityOtherEmoji: '💭',
 
   /* --- 8. final screen --- */
-  finalTitle: 'It is a date! 🥰',
-  finalMessage: 'I honestly cannot wait. I will be counting down the days.',
-  finalSignoff: 'See you soon! 💕',
+  finalTitle: 'All noted down 🥰',
+  finalMessage: 'I have written everything down for him. Here is the note I made.',
+  finalSignoff: 'Have fun you two 💕',
   finalDateLabel: 'When',
   finalActivityLabel: 'What',
 

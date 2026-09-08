@@ -17,24 +17,24 @@
 const LETTER_CONFIG = {
   fileName: 'our-hangout.png',
 
-  title: 'IT IS A DATE',
+  title: 'WE ARE HANGING OUT',
   whenLabel: 'WHEN',
   whatLabel: 'WHAT',
-  note: 'I cannot wait to see you',
-  signoff: 'from me, with love',
+  note: 'Looking forward to it, see you then',
+  signoff: 'delivered by Mochi the messenger cat',
 
   /* Text shown under the picture on the final screen. */
-  howTo: 'Save this picture and send it to me 💌',
+  howTo: 'Save this picture and send it to him 💌',
   steps: [
     '1. Tap Save the picture (or hold the picture to save it)',
-    '2. Send it to me on any of these',
+    '2. Send it to him on any of these, and he will know',
   ],
   saveButton: 'Save the picture',
   shareButton: 'Share it now',
-  savedMessage: 'Saved 💾 now send it to me',
+  savedMessage: 'Saved 💾 now send it to him',
 
   /* Text that goes with the image when she uses the share button. */
-  shareText: 'Look what I just answered 💕',
+  shareText: 'Mochi just delivered your message 💕',
 
   /* --- ✏️ PUT YOUR OWN HANDLES HERE ---
      Fill these in and the buttons open a chat with YOU directly. Leave a
@@ -153,10 +153,10 @@ const Letter = {
     g.fillRect(96, 96, W - 192, H - 192);
     this.drawFrame(g, 96, 96, W - 192, H - 192, 8, '#ffd0e6');
 
-    // --- title ---
+    // --- title (wraps if you give it a longer one) ---
     g.fillStyle = c.accent;
-    g.font = '52px "Press Start 2P", monospace';
-    g.fillText(LETTER_CONFIG.title, W / 2, 260);
+    g.font = '42px "Press Start 2P", monospace';
+    this.drawWrapped(g, LETTER_CONFIG.title, W / 2, 250, 800, 56);
 
     // --- the cat, in love ---
     const pixel = 15;
@@ -194,9 +194,9 @@ const Letter = {
     g.fillStyle = c.accent;
     this.drawWrapped(g, LETTER_CONFIG.note, W / 2, 1130, W - 280, 58);
 
-    g.font = '22px "Press Start 2P", monospace';
+    g.font = '18px "Press Start 2P", monospace';
     g.fillStyle = c.inkSoft;
-    g.fillText(LETTER_CONFIG.signoff, W / 2, 1240);
+    this.drawWrapped(g, LETTER_CONFIG.signoff, W / 2, 1230, 820, 30);
 
     this.canvas = canvas;
     return canvas;
@@ -333,7 +333,7 @@ function glyphSvg(rows) {
          'aria-hidden="true">' + rects.join('') + '</svg>';
 }
 
-/** The three send-it-to-me buttons. */
+/** The three send-it-to-him buttons. */
 function buildSocialLinks() {
   const row = document.getElementById('social-row');
   if (!row || row.childElementCount) return;
