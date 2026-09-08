@@ -43,7 +43,7 @@ const CONFIG = {
      Faces : happy | shy | nervous | curious | pleading | sad | excited | love
      Moods : idle  | shy | nervous | curious | wiggle   | sad | happy   | love  */
   greeting: {
-    text: 'Hiii, Mochi here. I am delivering this for someone who likes you a lot.',
+    text: 'Hiii, Mochi here! A friend of yours asked me to bring you a little message.',
     face: 'happy',   // it smiles once it has finished hopping in
     mood: 'idle',
   },
@@ -86,7 +86,7 @@ const CONFIG = {
       speed: 220,          // types out slowly on purpose
     },
     {
-      text: 'He told me to tell you that even though he cannot see you right now, he just knows you look reallyyyyyy cute.',
+      text: 'He wanted me to tell you that you are reallyyyyyy cute hehe 💖',
       face: 'shy',
       mood: 'shy',
       theme: 'sweet',      // dreamy pink-lavender background
